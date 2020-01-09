@@ -3,3 +3,4 @@ autopep8==1.4.4
 lxml===4.4.2
 selenium===3.141.0
 requests===2.22.0
+pytz===2019.3

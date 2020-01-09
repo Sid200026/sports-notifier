@@ -8,6 +8,7 @@ from notification import notify
 import sys
 from datetime import datetime
 import requests
+import pytz
 
 
 def MatchDetails(url):
@@ -29,12 +30,13 @@ def MatchDetails(url):
     if time.string.strip().lower() in ['ft', 'full-time', 'fulltime']:
         notify(scoreline, FootballConsts.matchFinished.value)
         sys.exit()
-    if time.string.strip().lower() in ["ht", "halftime", "half-time", "pause"]:
-        print("Half Time")
-        sleep(180)
-    # Do not get the seconds. Only the minutes
     endindex = time.string.find(":")
     timePassed = time.string[0:endindex] + " minutes"
+    if time.string.strip().lower() in ["ht", "halftime", "half-time", "pause"]:
+        print("Half Time")
+        timePassed = "Half Time"
+        sleep(180)
+    # Do not get the seconds. Only the minutes
     driver.quit()
     notify(scoreline, timePassed)
     sleep(60)
@@ -42,7 +44,8 @@ def MatchDetails(url):
 
 
 def fetchMatch():
-    d = datetime.today()
+    tz = pytz.timezone('Asia/Kolkata')
+    d = datetime.now(tz)
     d = d.strftime("%Y%m%d")
     url = FootballConsts.apiConst.value.format(d)
     site = requests.get(url)
