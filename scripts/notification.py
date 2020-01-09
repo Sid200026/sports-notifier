@@ -19,5 +19,5 @@ def notifyMACOS(title, text):
 
 def notifyLinux(title, text):
     os.system(f"""
-                notify-send '{title}' '{text}' -u critical
+                notify-send '{title}' '{text}'
                 """)
