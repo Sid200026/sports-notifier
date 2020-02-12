@@ -11,7 +11,7 @@ import requests
 import pytz
 
 
-def MatchDetails(url):
+def MatchDetails(url, team1=None, team2=None):
     options = Options()
     # Do not open the chrome browser
     options.add_argument('--headless')
@@ -21,9 +21,12 @@ def MatchDetails(url):
     htmlSource = driver.page_source
     soup = BeautifulSoup(htmlSource, "lxml")
     team = []
-    teams = soup.find_all("div", class_=re.compile("MatchHeaderTeamTitle"))
-    for t in teams:
-        team.append(t.string)
+    if team1 is None or team2 is None:
+        teams = soup.find_all("div", class_=re.compile("MatchHeaderTeamTitle"))
+        for t in teams:
+            team.append(t.string)
+    else:
+        team = [team1, team2]
     score = soup.find("div", class_=re.compile("LivescoreMatchScore"))
     time = soup.find("div", class_=re.compile("LivescoreMatchTime"))
     scoreline = f"{team[0]} {score.string.strip()} {team[1]}"
@@ -40,7 +43,7 @@ def MatchDetails(url):
     driver.quit()
     notify(scoreline, timePassed)
     sleep(60)
-    MatchDetails(url)
+    MatchDetails(url, team[0], team[1])
 
 
 def fetchMatch():
@@ -55,9 +58,9 @@ def fetchMatch():
     teamFound = False
     teamName = input()
     for match in matches:
-        team1 = match.attrs['ateam']
-        team2 = match.attrs['hteam']
-        if teamName in team1 or teamName in team2:
+        team1 = match.attrs['ateam'].lower()
+        team2 = match.attrs['hteam'].lower()
+        if teamName.lower() in team1 or teamName.lower() in team2:
             teamFound = True
             url = f"{FootballConsts.baseURL.value}/livescores/{match.attrs['id']}"
             MatchDetails(url)
